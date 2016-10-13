@@ -2,8 +2,6 @@ var webshot = require('webshot');
 
 var selector = "body > center:nth-child(1) > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2) > table:nth-child(1)";
 
-selector ="#readme";
-
 var options = {
   defaultWhiteBackground: true,
   quality: 100,
@@ -12,8 +10,7 @@ var options = {
   captureSelector: selector
 };
 
-var url = "http://tvtickets.com/fmi/shows/browserecord.php?show=The%20Big%20Bang%20Theory";
-url = "https://github.com/kpdecker/node-resemble";
+var url = "";
 
 webshot(url, 
     'current.png', 
