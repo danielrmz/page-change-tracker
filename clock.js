@@ -8,7 +8,7 @@ setInterval(
         Tracker.startProcess(); 
         console.log("- Done...");
     },
-    1000 * 60 
+    1000 * 60 * process.env.CHECK_NOTIFICATION_INTERVAL
 );
 
 Tracker.startProcess(); 

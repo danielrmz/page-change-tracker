@@ -20,7 +20,8 @@
                 "CLOUDINARY_URL":"",
                 "CHECK_NOTIFICATION_EMAIL":"",
                 "CHECK_NOTIFICATION_TITLE":"PageChangeTracker found differences!",
-                "SENDGRID_API_KEY":""
+                "SENDGRID_API_KEY":"",
+                "CHECK_NOTIFICATION_INTERVAL": ""
             },
             "console": "internalConsole",
             "sourceMaps": false,

@@ -17,7 +17,12 @@
     "CHECK_NOTIFICATION_TITLE": {
       "description": "Title of the email to be sent.",
       "value": "PageChangeTracker found differences!"
+    },
+    "CHECK_NOTIFICATION_INTERVAL": {
+      "description": "How often to check for changes (in minutes)",
+      "value": "60"
     }
+    
   },
   "scripts": {
     "postdeploy": "npm install"
