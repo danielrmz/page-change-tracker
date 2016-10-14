@@ -1,0 +1,25 @@
+{
+  "name": "Page Change Tracker",
+  "description": "Scheduler to track any changes between a particular web page.",
+  "repository": "https://github.com/danielrmz/page-change-tracker",
+  "logo": "",
+  "keywords": ["node", "scheduler", "tracker"],
+  "addons": ["cloudinary:starter", "sendgrid:starter"],
+  "env": { 
+    "CHECK_URL": {
+      "description": "Url which is going to get checked for changes.",
+      "value": ""
+    },
+    "CHECK_NOTIFICATION_EMAIL": {
+      "description": "Email which the alerts are going to be sent..",
+      "value": ""
+    },
+    "CHECK_NOTIFICATION_TITLE": {
+      "description": "Title of the email to be sent.",
+      "value": "PageChangeTracker found differences!"
+    }
+  },
+  "scripts": {
+    "postdeploy": "npm install"
+  }
+}

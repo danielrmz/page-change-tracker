@@ -15,7 +15,12 @@
                 "--nolazy"
             ],
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "development",
+                "CHECK_URL":"",
+                "CLOUDINARY_URL":"",
+                "CHECK_NOTIFICATION_EMAIL":"",
+                "CHECK_NOTIFICATION_TITLE":"PageChangeTracker found differences!",
+                "SENDGRID_API_KEY":""
             },
             "console": "internalConsole",
             "sourceMaps": false,
