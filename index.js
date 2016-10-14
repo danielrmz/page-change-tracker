@@ -8,7 +8,7 @@ var fs         = require('fs');
 var PNGImage   = require('pngjs-image');
 
 // Url for which to compare with previous.
-var url = process.env.CHECK_URL || "google.com";
+var url = process.env.CHECK_URL;
 
 // Options for the screenshot.
 var options = {
