@@ -2,10 +2,10 @@
 
 var webshot    = require('webshot');
 var cloudinary = require('cloudinary');
-var blinkdiff  = require('blink-diff');
-var request    = require('request');
+var blinkdiff  = require('blink-diff'); 
 var fs         = require('fs'); 
 var PNGImage   = require('pngjs-image');
+var Request    = require('request').defaults({ encoding: null });
 
 // Url for which to compare with previous.
 var url = process.env.CHECK_URL;
@@ -16,30 +16,65 @@ var options = {
   quality: 100, 
   userAgent: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
   captureSelector: "body center table:nth-child(2) tbody tr:nth-child(2) td:nth-child(2) table:nth-child(2) tbody tr td:nth-child(2) table", 
-  renderDelay: 1000,
+  renderDelay: 5000,
   errorIfJSException: function() {
     console.log("ERROR: ", arguments);
   },
-  streaming: true
+  streaming: true,
+  customCSS: "td { font-family:'arial' !important; font-size: 12px !important; }"
 };
   
 function sendNotificationEmail(prevImg, currImg) {
-  debugger;
+  
   var helper = require('sendgrid').mail;
   var from_email = new helper.Email(process.env.CHECK_NOTIFICATION_EMAIL);
   var to_email = new helper.Email(process.env.CHECK_NOTIFICATION_EMAIL);
   var subject = process.env.CHECK_NOTIFICATION_TITLE;
-  var content = new helper.Content('text/html', 'Page changes detected! <br /><br /><table><tr><td>Previous</td><td></td><td>Current</td></tr><tr><td><img src="'+prevImg+'"/></td><td> vs. </td><td><img src="'+currImg+'"/></td></tr></table>');
+  var content = new helper.Content('text/html', 'Page changes detected! <br /><br />Url: ' + process.env.CHECK_URL + ' <br /><br /><table><tr><td>Previous</td><td></td><td>Current</td></tr><tr><td><img src="cid:previous.png"/></td><td> vs. </td><td><img src="cid:current.png"/></td></tr></table>');
   var mail = new helper.Mail(from_email, subject, to_email, content);
 
   var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
-  var request = sg.emptyRequest({ method: 'POST', path: '/v3/mail/send', body: mail.toJSON() });
 
-  sg.API(request, function(error, response) {
-    console.log(response.statusCode);
-    console.log(response.body);
-    console.log(response.headers);
+  Request(prevImg, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+          var prevData = (new Buffer(body).toString('base64'));
+           
+          Request(currImg, function (error1, response1, body1) {
+              if (!error1 && response1.statusCode == 200) {
+                  var currData = (new Buffer(body1).toString('base64'));
+                  
+                  var currAtt = new helper.Attachment(); 
+                  currAtt.setContent(currData);
+                  currAtt.setType(response1.headers["content-type"]);
+                  currAtt.setFilename('current.png'); 
+                  currAtt.setDisposition('inline');
+                  currAtt.setContentId('current.png');
+
+                  mail.addAttachment(currAtt);
+
+                  var prevAtt = new helper.Attachment(); 
+                  prevAtt.setContent(prevData);
+                  prevAtt.setType(response.headers["content-type"]);
+                  prevAtt.setFilename('previous.png'); 
+                  prevAtt.setDisposition('inline');
+                  prevAtt.setContentId('previous.png');
+
+                  mail.addAttachment(prevAtt);
+              
+                  var request = sg.emptyRequest({ method: 'POST', path: '/v3/mail/send', body: mail.toJSON() });
+       
+                  sg.API(request, function(error, response) {
+                      console.log(response.statusCode);
+                      console.log(response.body);
+                      console.log(response.headers);
+                  });
+
+           }
+          });
+      }
   });
+
+  
 };
 
 
@@ -72,26 +107,26 @@ function compareImages(prevImgUrl, currImgUrl) {
         });
     }); 
 };
- 
+  
+
 function startProcess() {
   cloudinary.api.resource('current', 
     function(result) {
-      var hasPreviousImage = false;
       if(result.http_code != 404) {
-        hasPreviousImage = true;
-        debugger;
-        cloudinary.uploader.rename('current', 'previous', function() {
+        // Once resolved, if there was a previous image compare them. 
 
-          // Fetch current screenshot from source.
+        cloudinary.uploader.rename('current', 'previous', function(rr) {
+
+          console.log("New Previous: ", rr);
+
           webshot(url, options, function(err, stream){  
             var cstream = cloudinary.uploader.upload_stream(function(currentImageData) { 
-                // Once resolved, if there was a previous image compare them. 
-                if(hasPreviousImage) {
-                  var currentImage = currentImageData.url;
-                  var previousImage = cloudinary.url("previous");
-                  
-                  compareImages(previousImage, currentImage);
-                }
+                console.log("New Current: ", currentImageData);
+
+                var currentImage = currentImageData.url;
+                var previousImage = rr.url; 
+                
+                compareImages(previousImage, currentImage); 
             }, 
             { 
               public_id: 'current', 
@@ -105,20 +140,7 @@ function startProcess() {
 
         // Fetch current screenshot from source.
         webshot(url, options, function(err, stream){  
-          var cstream = cloudinary.uploader.upload_stream(function(currentImageData) { 
-              // Once resolved, if there was a previous image compare them. 
-              if(hasPreviousImage) {
-                var currentImage = currentImageData.url;
-                var previousImage = cloudinary.url("previous");
-                
-                compareImages(previousImage, currentImage);
-              }
-          }, 
-          { 
-            public_id: 'current', 
-            tags: [ new Date().toISOString().split('.')[0] ] 
-          });
-
+          var cstream = cloudinary.uploader.upload_stream(function(currentImageData) { }, { public_id: 'current', tags: [ new Date().toISOString().split('.')[0] ] });
           stream.pipe(cstream); 
         }); 
 
