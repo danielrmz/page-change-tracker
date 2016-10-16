@@ -11,11 +11,13 @@
     },
     "CHECK_URL_SHORT": {
       "description": "Short url for SMS links.",
-      "value": ""
+      "value": "",
+      "required": false
     },
     "CHECK_PAGE_SELECTOR": {
       "description": "If you want to diff for a particular dom selector only",
-      "value": ""
+      "value": "",
+      "required": false
     },
     "CHECK_NOTIFICATION_EMAIL": {
       "description": "Email which the alerts are going to be sent..",
@@ -31,11 +33,17 @@
     },
     "CHECK_NOTIFICATION_SMSNUMBER": {
       "description": "SMS Phone number where to notify of changes.",
-      "value": ""
+      "value": "",
+      "required": false
     }
     
   },
   "scripts": {
     "postdeploy": "npm install"
-  }
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/stomita/heroku-buildpack-phantomjs"
+    }
+  ]
 }
