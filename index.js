@@ -15,7 +15,7 @@ var options = {
   defaultWhiteBackground: true,
   quality: 100, 
   userAgent: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-  captureSelector: "body center table:nth-child(2) tbody tr:nth-child(2) td:nth-child(2) table:nth-child(2) tbody tr td:nth-child(2) table", 
+  captureSelector: process.env.CHECK_PAGE_SELECTOR,  
   renderDelay: 5000,
   errorIfJSException: function() {
     console.log("ERROR: ", arguments);
@@ -24,8 +24,33 @@ var options = {
   customCSS: "td { font-family:'arial' !important; font-size: 12px !important; }"
 };
   
+function sendNotificationSMS() {
+
+  if(!process.env.CHECK_NOTIFICATION_SMSNUMBER || !process.env.EASYSMS_URL) {
+    console.error('SMS Configuration not set.');
+    return;
+  }
+
+  var options = {
+    uri: process.env.EASYSMS_URL + "/messages",
+    method: 'POST',
+    json: 
+    {
+      "to": process.env.CHECK_NOTIFICATION_SMSNUMBER,
+      "body": "Found some differences in the page you're tracking. " + (process.env.CHECK_URL_SHORT || "")
+    }
+  };
+
+  Request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body) // Print the shortened url.
+    }
+  });
+}
+
 function sendNotificationEmail(prevImg, currImg) {
-  
+  sendNotificationSMS();
+
   var helper = require('sendgrid').mail;
   var from_email = new helper.Email(process.env.CHECK_NOTIFICATION_EMAIL);
   var to_email = new helper.Email(process.env.CHECK_NOTIFICATION_EMAIL);
@@ -156,6 +181,7 @@ if(require.main === module) {
   startProcess();
 } else {
   module.exports = {
-      startProcess: startProcess
+      startProcess: startProcess, 
+      sendNotificationSMS : sendNotificationSMS
   };
 }

@@ -2,12 +2,19 @@
   "name": "Page Change Tracker",
   "description": "Scheduler to track any changes between a particular web page.",
   "repository": "https://github.com/danielrmz/page-change-tracker",
-  "logo": "",
   "keywords": ["node", "scheduler", "tracker"],
-  "addons": ["cloudinary:starter", "sendgrid:starter"],
+  "addons": ["cloudinary:starter", "sendgrid:starter", "easysms:test"],
   "env": { 
     "CHECK_URL": {
       "description": "Url which is going to get checked for changes.",
+      "value": ""
+    },
+    "CHECK_URL_SHORT": {
+      "description": "Short url for SMS links.",
+      "value": ""
+    },
+    "CHECK_PAGE_SELECTOR": {
+      "description": "If you want to diff for a particular dom selector only",
       "value": ""
     },
     "CHECK_NOTIFICATION_EMAIL": {
@@ -21,6 +28,10 @@
     "CHECK_NOTIFICATION_INTERVAL": {
       "description": "How often to check for changes (in minutes)",
       "value": "60"
+    },
+    "CHECK_NOTIFICATION_SMSNUMBER": {
+      "description": "SMS Phone number where to notify of changes.",
+      "value": ""
     }
     
   },
