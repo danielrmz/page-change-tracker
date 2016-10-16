@@ -181,7 +181,6 @@ if(require.main === module) {
   startProcess();
 } else {
   module.exports = {
-      startProcess: startProcess, 
-      sendNotificationSMS : sendNotificationSMS
+      startProcess: startProcess
   };
 }
